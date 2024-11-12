@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Responsive E-Commerce Header with Modals</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+/* Modal Content */
+.modal-content {
+  background-color: white;
+  margin: 5% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%;
+  max-width: 600px;
+}
+
+/* Close Button */
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+  .card-img-top {
+    width: 150px;
+    height: 150px;
+    object-fit: fill; /* Ensures the image fills the area without distortion */
+  }
+
+    .navbar-brand {
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+    .location-info {
+      font-size: 0.9rem;
+      color: #6c757d;
+      margin-left: 15px;
+    }
+    .search-bar {
+      max-width: 400px;
+      width: 100%;
+      margin-left: 15px;
+    }
+    .header-buttons {
+      display: flex;
+      gap: 10px;
+    }
+    /* Category card 3D effect */
+    .category-card {
+      transition: transform 0.2s ease, background-color 0.3s;
+      cursor: pointer;
+      border: #0d6efd;
+    }
+    .category-card:hover {
+      transform: scale(1.05);
+      background-color: #f8f9fa;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Product card with Add to Cart button */
+    .card {
+      position: relative;
+      overflow: hidden;
+    }
+    .add-to-cart-btn {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      display: none;
+      transition: opacity 0.2s;
+    }
+    .card img {
+        width: 100%;
+        height: 200px; /* Ensures a consistent height */
+        object-fit: cover; /* Keeps the aspect ratio without stretching */
+        border-radius: 5px;
+    }
+    .card:hover .add-to-cart-btn {
+      display: inline-block;
+      opacity: 1;
+    }
+
+    /* Hover effect on product card */
+    .card:hover {
+      border-color: #0d6efd;
+      box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2);
+      transition: 0.3s;
+    }
+
+  </style>
+</head>
+<body>
+
+<!-- Header Section -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
+  <div class="container-fluid">
+    <!-- Left Section: Website Title -->
+    <a class="navbar-brand" href="#">ZipIt</a>
+
+    <!-- Center Section: Location Info and Search Bar -->
+    <div class="d-flex align-items-center flex-grow-1">
+      <div class="location-info">
+        📍 Location: Vellore,Tamilnadu
+      </div>
+      <form class="d-flex search-bar">
+        <input class="form-control me-2" type="search" placeholder="Search products..." aria-label="Search">
+        <button class="btn btn-outline-primary" type="submit">Search</button>
+      </form>
+    </div>
+
+    <!-- Right Section: Cart, Login, Register -->
+    <div class="header-buttons">
+      <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#cartModal" onclick="displayCart()"><i class="bi bi-cart"></i></button>
+     <!-- Profile Button (Initially hidden) -->
+      <button id="profileBtn" class="btn btn-success ms-2" onclick="viewProfile()">LogOut<button>
+    </div>
+  </div>
+</nav>
+
+<!-- Navigation Bar Below Header -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div class="container-fluid">
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav mx-auto">
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="#">Home</a>
+        </li>
+        <li class="nav-item">
+          <a onclick="trackOrder()" id= "trackBtn" class="nav-link" data-bs-toggle="modal" data-bs-target="#trackingModal">Tracking</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Tracking Modal -->
+<div class="modal fade" id="trackingModal" tabindex="-1" aria-labelledby="trackingModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="trackingModalLabel">Order Tracking</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="trackingModalBody">
+        <!-- Tracking information will be populated here -->
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- Cart Modal -->
+<div class="modal fade" id="cartModal" tabindex="-1" aria-labelledby="cartModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="cartModalLabel">Shopping Cart</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="cartModalBody">
+        <p>Your cart is currently empty.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" onclick="placeOrder()">Checkout</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Category Section -->
+<div class="container my-4">
+    <div class="row g-3">
+      <div class="col-md-3" onclick="scrollToCategory('fruits-vegetables')">
+        <div class="card category-card">
+          <div class="card-body text-center">
+            <h5>Fruits & Vegetables</h5>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3" onclick="scrollToCategory('dairy-bread-eggs')">
+        <div class="card category-card">
+          <div class="card-body text-center">
+            <h5>Dairy & Bread</h5>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3" onclick="scrollToCategory('atta-rice-oil-dals')">
+        <div class="card category-card">
+          <div class="card-body text-center">
+            <h5>Atta, Rice, Oil & Dals</h5>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3" onclick="scrollToCategory('meat-fish-eggs')">
+        <div class="card category-card">
+          <div class="card-body text-center">
+            <h5>Meat, Fish & Eggs</h5>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Product Sections -->
+  <div class="container my-4">
+    <!-- Fruits & Vegetables -->
+    <div id="fruits-vegetables" class="category-section">
+      <h2>Fruits & Vegetables</h2>
+      <div class="row g-3">
+        <div class="col-md-3">
+          <div class="card">
+            <img src="adolescent/static/images/bananas.jpg" class="card-img-top" alt="Product">
+            <div class="card-body">
+              <h5>Bananas</h5>
+              <p>$1.99 / kg</p>
+              <button class="btn btn-primary add-to-cart-btn" onclick="addToCart('Bananas', 1.99)">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card">
+            <img src="adolescent/static/images/apples.jpeg" class="card-img-top" alt="Product">
+            <div class="card-body">
+              <h5>Apples</h5>
+              <p>$3.49 / kg</p>
+              <button class="btn btn-primary add-to-cart-btn" onclick="addToCart('Apples', 1.99)">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+              <img src="adolescent/static/images/Passionfruit.png" class="card-img-top" alt="Product">
+              <div class="card-body">
+                <h5>Passion Fruit</h5>
+                <p>$1.99 / kg</p>
+                <button class="btn btn-primary add-to-cart-btn" onclick="addToCart('Bananas', 1.99)">Add to Cart</button>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card">
+              <img src="adolescent/static/images/strawberries.jpeg" class="card-img-top" alt="Product">
+              <div class="card-body">
+                <h5>strawberries</h5>
+                <p>$1.99 / kg</p>
+                <button class="btn btn-primary add-to-cart-btn" onclick="addToCart('Passion Fruit', 1.99)">Add to Cart</button>
+              </div>
+            </div>
+          </div>
+          
+      </div>
+    </div>
+  
+    <!-- Dairy, Bread & Eggs -->
+    <div id="dairy-bread-eggs" class="category-section">
+      <h2>Dairy & Bread</h2>
+      <div class="row g-3">
+        <div class="col-md-3">
+          <div class="card">
+            <img src="adolescent/static/images/milk.jpg" class="card-img-top" alt="Product">
+            <div class="card-body">
+              <h5>Milk</h5>
+              <p>$0.99 / liter</p>
+              <button class="btn btn-primary add-to-cart-btn" onclick="addToCart('Milk', 0.99)">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card">
+            <img src="adolescent/static/images/bread.jpg" class="card-img-top" alt="Product">
+            <div class="card-body">
+              <h5>Bread</h5>
+              <p>$1.49</p>
+              <button class="btn btn-primary add-to-cart-btn" onclick="addToCart('Bread', 1.49)">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+              <img src="adolescent/static/images/chesse.jpeg" class="card-img-top" alt="Product">
+              <div class="card-body">
+                <h5>Chesse</h5>
+                <p>$1.49</p>
+                <button class="btn btn-primary add-to-cart-btn" onclick="addToCart('Chesse', 1.49)">Add to Cart</button>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card">
+              <img src="adolescent/static/images/yougurt.jpg" class="card-img-top" alt="Product">
+              <div class="card-body">
+                <h5>Yogurt</h5>
+                <p>$1.49</p>
+                <button class="btn btn-primary add-to-cart-btn" onclick="addToCart('Yogurt', 1.49)">Add to Cart</button>
+              </div>
+            </div>
+          </div>
+      </div>
+    </div>
+  
+    <!-- Atta, Rice, Oil & Dals -->
+    <div id="atta-rice-oil-dals" class="category-section">
+      <h2>Atta, Rice, Oil & Dals</h2>
+      <div class="row g-3">
+        <div class="col-md-3">
+          <div class="card">
+            <img src="adolescent/static/images/flour.jpg" class="card-img-top" alt="Product">
+            <div class="card-body">
+              <h5>Wheat Flour</h5>
+              <p>$2.99 / kg</p>
+              <button class="btn btn-primary add-to-cart-btn" onclick="addToCart('Wheat Flour', 1.99)">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card">
+            <img src="adolescent/static/images/rice.jpg" class="card-img-top" alt="Product">
+            <div class="card-body">
+              <h5>Rice</h5>
+              <p>$1.99 / kg</p>
+              <button class="btn btn-primary add-to-cart-btn" onclick="addToCart('Rice', 1.99)">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+              <img src="adolescent/static/images/oliveoil.webp" class="card-img-top" alt="Product">
+              <div class="card-body">
+                <h5>Olive Oil</h5>
+                <p>$1.99 / kg</p>
+                <button class="btn btn-primary add-to-cart-btn" onclick="addToCart('olive Oil', 1.99)">Add to Cart</button>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card">
+              <img src="adolescent/static/images/rajma.webp" class="card-img-top" alt="Product">
+              <div class="card-body">
+                <h5>Rajma</h5>
+                <p>$1.99 / kg</p>
+                <button class="btn btn-primary add-to-cart-btn" onclick="addToCart('Rajma', 1.99)">Add to Cart</button>
+              </div>
+            </div>
+          </div>
+      </div>
+    </div>
+  
+    <!-- Meat, Fish & Eggs -->
+    <div id="meat-fish-eggs" class="category-section">
+      <h2>Meat, Fish & Eggs</h2>
+      <div class="row g-3">
+        <div class="col-md-3">
+          <div class="card">
+            <img src="adolescent/static/images/chicken.jpg" class="card-img-top" alt="Product">
+            <div class="card-body">
+              <h5>Chicken</h5>
+              <p>$4.99 / kg</p>
+              <button class="btn btn-primary add-to-cart-btn" onclick="addToCart('Chicken', 4.99)">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card">
+            <img src="adolescent/static/images/fish.jpg" class="card-img-top" alt="Product">
+            <div class="card-body">
+              <h5>Fish</h5>
+              <p>$1.49 / kg</p>
+              <button class="btn btn-primary add-to-cart-btn" onclick="addToCart('Fish', 1.49)">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+              <img src="adolescent/static/images/egg.webp" class="card-img-top" alt="Product">
+              <div class="card-body">
+                <h5>Eggs</h5>
+                <p>$0.49 / kg</p>
+                <button class="btn btn-primary add-to-cart-btn" onclick="addToCart('Eggs', 0.49)">Add to Cart</button>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card">
+              <img src="adolescent/static/images/prawn.webp" class="card-img-top" alt="Product">
+              <div class="card-body">
+                <h5>Prawns</h5>
+                <p>$6.99 / kg</p>
+                <button class="btn btn-primary add-to-cart-btn" onclick="addToCart('prawns', 6.99)">Add to Cart</button>
+
+              </div>
+            </div>
+          </div>
+      </div>
+    </div>
+  </div>
+  <!-- Footer Section -->
+<footer class="bg-dark text-light pt-4">
+    <div class="container">
+      <div class="row">
+        <!-- About Us Section -->
+        <div class="col-md-3">
+          <h5>About Us</h5>
+          <p>We are a leading e-commerce platform providing a wide range of products to our customers. Quality and customer satisfaction are our top priorities.</p>
+        </div>
+  
+        <!-- Customer Service Section -->
+        <div class="col-md-3">
+          <h5>Customer Service</h5>
+          <ul class="list-unstyled">
+            <li><a href="#" class="text-light text-decoration-none">Help Center</a></li>
+            <li><a href="#" class="text-light text-decoration-none">Returns</a></li>
+            <li><a href="#" class="text-light text-decoration-none">Shipping</a></li>
+            <li><a href="#" class="text-light text-decoration-none">Track Order</a></li>
+          </ul>
+        </div>
+  
+        <!-- Quick Links Section -->
+        <div class="col-md-3">
+          <h5>Quick Links</h5>
+          <ul class="list-unstyled">
+            <li><a href="#" class="text-light text-decoration-none">Home</a></li>
+            <li><a href="#" class="text-light text-decoration-none">Categories</a></li>
+            <li><a href="#" class="text-light text-decoration-none">Offers</a></li>
+            <li><a href="#" class="text-light text-decoration-none">New Arrivals</a></li>
+          </ul>
+        </div>
+  
+        <!-- Contact Us Section -->
+        <div class="col-md-3">
+          <h5>Contact Us</h5>
+          <p><i class="bi bi-geo-alt-fill"></i> 123 Main Street, Vellore, India</p>
+          <p><i class="bi bi-envelope-fill"></i> support@example.com</p>
+          <p><i class="bi bi-telephone-fill"></i> +91 12345 67890</p>
+        </div>
+      </div>
+  
+      <!-- Social Media Links and Copyright -->
+      <div class="row mt-4">
+        <div class="col-md-12 text-center">
+          <a href="#" class="text-light me-3"><i class="bi bi-facebook"></i></a>
+          <a href="#" class="text-light me-3"><i class="bi bi-twitter"></i></a>
+          <a href="#" class="text-light me-3"><i class="bi bi-instagram"></i></a>
+          <a href="#" class="text-light"><i class="bi bi-linkedin"></i></a>
+          <p class="mt-3">&copy; 2024 Your E-Commerce Site. All Rights Reserved.</p>
+        </div>
+      </div>
+    </div>
+  </footer>
+  
+  <!-- Bootstrap Icons CSS (Optional) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.5.0/font/bootstrap-icons.min.css">
+  
+
+
+<!-- Bootstrap Icons (For Cart Icon) -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script> let cart = [];
+  let tracking = [];
+  let trackingStatus = [
+  "Order Placed",
+  "Shipped",
+  "Out for Delivery",
+  "Delivered",
+];
+let order = null;
+
+let currentStatusIndex = 0;
+
+  // Function to show the tracking modal
+  function showTrackingModal() {
+    const trackingModal = new bootstrap.Modal(document.getElementById('trackingModal'));
+    displayTrackingInfo();
+    trackingModal.show();
+  }
+
+  // Add event listener for the tracking button
+  document.getElementById('trackingButton').addEventListener('click', showTrackingModal);
+
+
+  // Function to handle checkout
+  function checkout() {
+    if (cart.length === 0) {
+      alert("Your cart is empty. Please add items to the cart before checkout.");
+      return;
+    }
+
+    // Add cart items to tracking array with a default status
+    cart.forEach(item => {
+      tracking.push({ name: item.name, price: item.price, status: "Order Placed" });
+    });
+
+    // Clear the cart after checkout
+    cart = [];
+    alert("Checkout successful! You can track your order.");
+
+    // Optionally close the cart modal
+    const cartModal = bootstrap.Modal.getInstance(document.getElementById('cartModal'));
+    cartModal.hide();
+  }
+
+  function createOrder() {
+  if (cart.length === 0) {
+    alert("Your cart is empty. Please add items to the cart before creating an order.");
+    return;
+  }
+
+  // Create an order with cart items
+  order = {
+    items: [...cart],
+    totalPrice: cart.reduce((total, item) => total + item.price, 0),
+    status: trackingStatus[currentStatusIndex],
+  };
+
+  // Clear the cart
+  cart.length = 0;
+
+  // Display the order and initial tracking status
+  displayTrackingModal();
+  updateTrackingStatus();
+}
+
+function displayTrackingModal() {
+  const trackingModalBody = document.getElementById("trackingModalBody");
+  trackingModalBody.innerHTML = "";
+
+  if (!order) {
+    trackingModalBody.innerHTML = "<p>No order found. Please place an order first.</p>";
+    return;
+  }
+
+  // Order details section
+  const orderDetails = document.createElement("div");
+  orderDetails.innerHTML = `
+    <h6>Order Details:</h6>
+    <ul id="orderItemsList"></ul>
+    <p><strong>Total Price:</strong> $${order.totalPrice.toFixed(2)}</p>
+  `;
+  trackingModalBody.appendChild(orderDetails);
+
+  // Populate the order items list
+  const orderItemsList = document.getElementById("orderItemsList");
+  order.items.forEach((item) => {
+    const listItem = document.createElement("li");
+    listItem.textContent = `${item.name} - $${item.price.toFixed(2)}`;
+    orderItemsList.appendChild(listItem);
+  });
+
+  // Tracking status section
+  const trackingStatusDiv = document.createElement("div");
+  trackingStatusDiv.id = "trackingStatusDiv";
+  trackingStatusDiv.innerHTML = `<p><strong>Current Status:</strong> ${order.status}</p>`;
+  trackingModalBody.appendChild(trackingStatusDiv);
+}
+
+function updateTrackingStatus() {
+  const trackingStatusDiv = document.getElementById("trackingStatusDiv");
+
+  if (!trackingStatusDiv) return;
+
+  const statusInterval = setInterval(() => {
+    currentStatusIndex++;
+
+    if (currentStatusIndex >= trackingStatus.length) {
+      clearInterval(statusInterval);
+      return;
+    }
+
+    // Update the order status
+    order.status = trackingStatus[currentStatusIndex];
+    trackingStatusDiv.innerHTML = `<p><strong>Current Status:</strong> ${order.status}</p>`;
+  }, 3000); // Updates every 3 seconds
+}
+
+function trackOrder() {
+  if (!order) {
+    alert("No order to track. Please place an order first.");
+    return;
+  }
+
+  displayTrackingModal();
+  const trackingModal = new bootstrap.Modal(document.getElementById("trackingModal"));
+  trackingModal.show();
+}
+
+// Function to handle the "Place Order" button click
+function placeOrder() {
+  createOrder();
+  alert("Your order has been placed successfully!");
+}
+
+
+// Function to show the modal when tracking button is clicked
+function showTrackingModal() {
+  const trackingModal = new bootstrap.Modal(document.getElementById('trackingModal'));
+  trackingModal.show();
+}
+
+// Example of calling the function when needed (e.g., on a button click)
+document.getElementById('trackingButton').addEventListener('click', showTrackingModal);
+
+
+// Function to add product to cart
+function addToCart(productName, productPrice) {
+  cart.push({ name: productName, price: productPrice });
+  alert(`${productName} has been added to your cart.`);
+}
+
+// Populate Cart Modal with items
+function displayCart() {
+  const cartModalBody = document.getElementById("cartModalBody");
+  cartModalBody.innerHTML = cart.length ? "" : "<p>Your cart is currently empty.</p>";
+  cart.forEach((item, index) => {
+    const cartItem = document.createElement("div");
+    cartItem.innerHTML = `<strong>${item.name}</strong> - $${item.price.toFixed(2)}`;
+    cartModalBody.appendChild(cartItem);
+  });
+}
+
+const users = {
+  admin: { username: "admin@g.in", password: "admin123" },
+  user: { username: "user@g.in", password: "user123" },
+  deliveryPartner: { username: "delivery", password: "delivery123" }
+};
+
+// Handle profile button click
+function viewProfile() {
+  window.location.href = 'landing.html';
+  // You can replace this with an actual profile page or modal
+}
+
+// Function to handle checkout button click
+function checkout() {
+
+}
+function viewTracking(){
+  
+}
+
+// Handle the tracking page
+document.addEventListener("DOMContentLoaded", function () {
+  const cart = JSON.parse(localStorage.getItem("cart")) || []; // Retrieve the cart from localStorage
+  const cartTableBody = document.getElementById("cartTableBody");
+
+  if (cart.length === 0) {
+    cartTableBody.innerHTML = "<tr><td colspan='3'>Your cart is empty.</td></tr>";
+  } else {
+    cart.forEach(item => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${item.name}</td>
+        <td>$${item.price.toFixed(2)}</td>
+        <td>Pending</td> <!-- You can adjust the status as per your requirement -->
+      `;
+      cartTableBody.appendChild(row);
+    });
+  }
+});
+
+// Handle registration and role redirection
+document.getElementById("registerForm").addEventListener("submit", function(event) {
+  event.preventDefault();
+  const userRole = document.getElementById("userRole").value;
+  if (userRole === "deliveryPartner") {
+    window.location.href = "deliveryPartnerDashboard.html"; // Redirect to delivery partner dashboard
+  } else {
+    window.location.href = "customerDashboard.html"; // Redirect to customer dashboard
+  }
+});
+
+// Scroll to category section
+function scrollToCategory(id) {
+  const section = document.getElementById(id);
+  section.scrollIntoView({ behavior: 'smooth' });
+}
+  </script>
+  <!-- Bootstrap JS (Include Popper.js and Bootstrap JS) -->
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
+</body>
+</html>

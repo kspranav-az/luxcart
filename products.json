@@ -1,0 +1,58 @@
+[
+  {
+    "name": "Bananas",
+    "price": 1.99,
+    "unit": "kg",
+    "image": "https://via.placeholder.com/150",
+    "category": "fruitsVegetables"
+  },
+  {
+    "name": "Apples",
+    "price": 2.49,
+    "unit": "kg",
+    "image": "https://via.placeholder.com/150",
+    "category": "fruitsVegetables"
+  },
+  {
+    "name": "Milk",
+    "price": 0.99,
+    "unit": "liter",
+    "image": "https://via.placeholder.com/150",
+    "category": "dairyBread"
+  },
+  {
+    "name": "Bread",
+    "price": 1.29,
+    "unit": "loaf",
+    "image": "https://via.placeholder.com/150",
+    "category": "dairyBread"
+  },
+  {
+    "name": "Wheat Flour",
+    "price": 2.99,
+    "unit": "kg",
+    "image": "https://via.placeholder.com/150",
+    "category": "attaRiceOilDals"
+  },
+  {
+    "name": "Rice",
+    "price": 1.59,
+    "unit": "kg",
+    "image": "https://via.placeholder.com/150",
+    "category": "attaRiceOilDals"
+  },
+  {
+    "name": "Chicken",
+    "price": 4.99,
+    "unit": "kg",
+    "image": "https://via.placeholder.com/150",
+    "category": "meatFishEggs"
+  },
+  {
+    "name": "Eggs",
+    "price": 2.49,
+    "unit": "dozen",
+    "image": "https://via.placeholder.com/150",
+    "category": "meatFishEggs"
+  }
+]

@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delivery Partner Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #1e1e2f;
+            color: #e0e0e0;
+            margin: 0;
+            padding: 0;
+            position: relative;
+        }
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #f5f5f5;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .order-table {
+            margin-top: 30px;
+            background-color: #333;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .table th, .table td {
+            text-align: center;
+        }
+        .table th {
+            background-color: #444;
+        }
+        .table td {
+            background-color: #555;
+        }
+        .table-button {
+            color: #fff;
+            background-color: #28a745;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .table-button:hover {
+            background-color: #218838;
+        }
+        .modal-header, .modal-footer {
+            background-color: #333;
+        }
+        .modal-title {
+            color: #ffc107;
+        }
+        .btn-primary {
+            background-color: #ffc107;
+            border: none;
+        }
+        .btn-danger {
+            background-color: #dc3545;
+            border: none;
+        }
+        .btn-info {
+            background-color: #17a2b8;
+            border: none;
+        }
+        .logout-btn {
+            background-color: #dc3545;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+        .logout-btn:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Delivery Partner Dashboard</h1>
+
+        <!-- Logout Button -->
+        <button class="logout-btn" onclick="logout()">Logout</button>
+
+        <!-- Order Table -->
+        <div class="order-table">
+            <table class="table table-bordered table-dark">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Customer Name</th>
+                        <th>Product</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="orderTableBody">
+                    <!-- Orders will be dynamically inserted here -->
+                    <!-- Example order row -->
+                    <tr>
+                        <td>ORD001</td>
+                        <td>John Doe</td>
+                        <td>Smartphone</td>
+                        <td>Pending</td>
+                        <td>
+                            <button class="table-button" onclick="acceptOrder('ORD001')">Accept Order</button>
+                            <button class="table-button" data-bs-toggle="modal" data-bs-target="#updateStatusModal" onclick="updateStatus('ORD001')" disabled>Update Status</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Update Status Modal -->
+        <div class="modal fade" id="updateStatusModal" tabindex="-1" aria-labelledby="updateStatusModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="updateStatusModalLabel">Update Order Status</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="updateStatusForm">
+                            <div class="mb-3">
+                                <label for="orderId" class="form-label">Order ID</label>
+                                <input type="text" class="form-control" id="orderId" readonly>
+                            </div>
+                            <div class="mb-3">
+                                <label for="trackingStatus" class="form-label">Tracking Status</label>
+                                <select class="form-control" id="trackingStatus">
+                                    <option value="In Transit">In Transit</option>
+                                    <option value="Delivered">Delivered</option>
+                                    <option value="Out for Delivery">Out for Delivery</option>
+                                    <option value="Returned">Returned</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Update Status</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Accept Order Logic with Warning Popup
+        function acceptOrder(orderId) {
+            const confirmAccept = confirm("Are you sure you want to accept this order?");
+            if (confirmAccept) {
+                // Simulating the acceptance of the order
+                alert('You have accepted the order: ' + orderId);
+
+                // Update the order row (for demo purposes)
+                const tableBody = document.getElementById('orderTableBody');
+                const rows = tableBody.rows;
+                for (let row of rows) {
+                    if (row.cells[0].textContent === orderId) {
+                        row.cells[3].textContent = 'Accepted';
+                        row.cells[4].innerHTML = `
+                            <button class="table-button" onclick="completeOrder('${orderId}')">Complete Delivery</button>
+                            <button class="table-button" data-bs-toggle="modal" data-bs-target="#updateStatusModal" onclick="updateStatus('${orderId}')">Update Status</button>
+                        `;
+                        // Enable the Update Status button
+                        row.cells[4].children[1].disabled = false;
+                    }
+                }
+            }
+        }
+
+        // Update Order Status Modal (Pre-fill with Order Details)
+        function updateStatus(orderId) {
+            // For demo, using static data. Fetch real data from the backend in a real app.
+            let orderData = {
+                'ORD001': {status: 'In Transit'},
+            };
+
+            const order = orderData[orderId];
+            document.getElementById('orderId').value = orderId;
+            document.getElementById('trackingStatus').value = order.status;
+        }
+
+        // Update Order Status Logic
+        document.getElementById('updateStatusForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            let orderId = document.getElementById('orderId').value;
+            let trackingStatus = document.getElementById('trackingStatus').value;
+
+            // Update the order status in the table (in a real app, this should update your backend too)
+            const tableBody = document.getElementById('orderTableBody');
+            const rows = tableBody.rows;
+            for (let row of rows) {
+                if (row.cells[0].textContent === orderId) {
+                    row.cells[3].textContent = trackingStatus;
+                }
+            }
+
+            // Close the modal
+            $('#updateStatusModal').modal('hide');
+        });
+
+        // Complete Delivery Logic
+        function completeOrder(orderId) {
+            // Here, you can update the order status to "Delivered" or mark it as completed
+            alert('Order ' + orderId + ' has been completed and delivered.');
+
+            // Update the order row (for demo purposes)
+            const tableBody = document.getElementById('orderTableBody');
+            const rows = tableBody.rows;
+            for (let row of rows) {
+                if (row.cells[0].textContent === orderId) {
+                    row.cells[3].textContent = 'Delivered';
+                    row.cells[4].innerHTML = ''; // Remove the action buttons
+                }
+            }
+        }
+
+        // Logout Logic
+        function logout() {
+            // Redirect to login page or show a confirmation
+            if (confirm("Are you sure you want to log out?")) {
+                // Redirect to login page (or handle logout in your way)
+                window.location.href = "login.html"; // Replace with actual login page URL
+            }
+        }
+    </script>
+</body>
+</html>

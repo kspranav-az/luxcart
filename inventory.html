@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory Management</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #1e1e2f;
+            color: #e0e0e0;
+        }
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            padding: 20px;
+        }
+        .product-table {
+            margin-top: 30px;
+        }
+        .product-image {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+        .table-button {
+            color: #fff;
+            background-color: #28a745;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .table-button:hover {
+            background-color: #218838;
+        }
+        .logout-btn {
+            background-color: #dc3545;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+        .logout-btn:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Inventory Management</h1>
+        
+         <!-- Navigation Bar -->
+         <nav class="navbar navbar-expand-lg navbar-dark">
+            <div class="container-fluid">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav mx-auto">
+                        <li class="nav-item"><a class="nav-link" href="admin.html">Home</a></li>
+                        <li class="nav-item"><a class="nav-link" href="orders.html">Orders</a></li>
+                        <li class="nav-item"><a class="nav-link active" href="inventory.html">Inventory</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addProductModal">Add New Product</button>
+        <button class="logout-btn" onclick="logout()">Logout</button>
+
+        <div class="product-table">
+            <table class="table table-bordered table-dark">
+                <thead>
+                    <tr>
+                        <th>Product Image</th>
+                        <th>Product Name</th>
+                        <th>Product ID</th>
+                        <th>Stock Quantity</th>
+                        <th>Price</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="productTableBody"></tbody>
+            </table>
+        </div>
+
+        <!-- Add Product Modal -->
+        <div class="modal fade" id="addProductModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Add New Product</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="addProductForm">
+                            <input type="file" id="productImage" required>
+                            <input type="text" id="productName" placeholder="Product Name" required>
+                            <input type="text" id="productId" placeholder="Product ID" required>
+                            <input type="number" id="productStock" placeholder="Stock Quantity" required>
+                            <input type="number" id="productPrice" placeholder="Price" required>
+                            <button type="submit" class="btn btn-primary">Add Product</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let products = JSON.parse(localStorage.getItem('products')) || [];
+        
+        function renderProducts() {
+            const productTableBody = document.getElementById('productTableBody');
+            productTableBody.innerHTML = '';
+            products.forEach((product, index) => {
+                productTableBody.innerHTML += `
+                    <tr>
+                        <td><img src="${product.image}" class="product-image"></td>
+                        <td>${product.name}</td>
+                        <td>${product.id}</td>
+                        <td>${product.stock}</td>
+                        <td>${product.price}</td>
+                        <td>
+                            <button class="table-button" onclick="deleteProduct(${index})">Delete</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        document.getElementById('addProductForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const image = URL.createObjectURL(document.getElementById('productImage').files[0]);
+            const name = document.getElementById('productName').value;
+            const id = document.getElementById('productId').value;
+            const stock = document.getElementById('productStock').value;
+            const price = document.getElementById('productPrice').value;
+
+            products.push({ image, name, id, stock, price });
+            localStorage.setItem('products', JSON.stringify(products));
+            renderProducts();
+            document.getElementById('addProductForm').reset();
+            new bootstrap.Modal(document.getElementById('addProductModal')).hide();
+        });
+
+        function deleteProduct(index) {
+            products.splice(index, 1);
+            localStorage.setItem('products', JSON.stringify(products));
+            renderProducts();
+        }
+
+        function logout() {
+            alert('Logging out...');
+
+            window.location.href = 'landing.html';
+        }
+
+        // Initial render
+        renderProducts();
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

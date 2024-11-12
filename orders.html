@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Orders Page</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #1e1e2f;
+            color: #e0e0e0;
+            margin: 0;
+            padding: 0;
+        }
+        .orders-container {
+            max-width: 1200px;
+            margin: auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #f5f5f5;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .order-table {
+            background: #333;
+            border-radius: 8px;
+            padding: 20px;
+        }
+        .table th, .table td {
+            color: #e0e0e0;
+        }
+        .btn-assign {
+            background-color: #ffc107;
+            color: #333;
+        }
+        .btn-assign:hover {
+            background-color: #e0a800;
+        }
+        
+        .logout-btn {
+            background-color: #dc3545;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+        .logout-btn:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+<body>
+    <div class="orders-container">
+
+        <!-- Navigation Bar -->
+        <nav class="navbar navbar-expand-lg navbar-dark">
+            <div class="container-fluid">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav mx-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="admin.html">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="orders.html">Orders</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="inventory.html">Inventory</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Logout Button -->
+        <button class="logout-btn" onclick="logout()">Logout</button>
+
+        <!-- Order Table -->
+        <div class="order-table">
+            <table class="table table-dark table-striped" id="ordersTable">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Order ID</th>
+                        <th>Customer Name</th>
+                        <th>Order Status</th>
+                        <th>Assign Delivery Partner</th>
+                    </tr>
+                </thead>
+                <tbody id="ordersBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and Popper.js -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+
+    <script>
+        // Sample delivery partners
+        const deliveryPartners = ["Partner A", "Partner B", "Partner C", "Partner D"];
+
+        // Generate random orders data
+        const generateRandomOrders = (numOrders) => {
+            const statuses = ["Pending", "Processing", "Shipped", "Delivered"];
+            const orders = [];
+
+            for (let i = 1; i <= numOrders; i++) {
+                const order = {
+                    id: `ORD-${Math.floor(1000 + Math.random() * 9000)}`,
+                    customerName: `Customer ${i}`,
+                    status: statuses[Math.floor(Math.random() * statuses.length)],
+                };
+                orders.push(order);
+            }
+
+            return orders;
+        };
+
+        // Render orders table
+        const renderOrdersTable = (orders) => {
+            const ordersBody = document.getElementById("ordersBody");
+            ordersBody.innerHTML = "";
+
+            orders.forEach((order, index) => {
+                const row = document.createElement("tr");
+
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${order.id}</td>
+                    <td>${order.customerName}</td>
+                    <td>${order.status}</td>
+                    <td>
+                        <select class="form-select">
+                            <option value="">Select Partner</option>
+                            ${deliveryPartners.map(partner => `<option value="${partner}">${partner}</option>`).join('')}
+                        </select>
+                        <button class="btn btn-assign mt-2">Assign</button>
+                    </td>
+                `;
+
+                ordersBody.appendChild(row);
+            });
+
+            // Add event listeners for assign buttons
+            const assignButtons = document.querySelectorAll('.btn-assign');
+            assignButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const selectElement = this.previousElementSibling;
+                    const selectedPartner = selectElement.value;
+                    if (selectedPartner) {
+                        alert(`Delivery Partner ${selectedPartner} assigned to Order ${this.closest('tr').querySelector('td:nth-child(2)').innerText}`);
+                    } else {
+                        alert('Please select a delivery partner');
+                    }
+                });
+            });
+        };
+
+        // Initialize page with random orders
+        const orders = generateRandomOrders(10); // Generate 10 random orders
+        renderOrdersTable(orders);
+    </script>
+</body>
+</html>
